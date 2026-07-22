@@ -1,0 +1,28 @@
+# R session files
+.Rhistory
+.RData
+.Ruserdata
+
+# RStudio user-specific files
+.Rproj.user/
+
+# macOS metadata
+.DS_Store
+
+# Quarto generated files and caches
+.quarto/
+*_cache/
+*_files/
+
+# Knitr cache
+cache/
+
+# Temporary files
+*.tmp
+*.log
+
+# Environment and secrets
+.Renviron
+.env
+.env.*
+
