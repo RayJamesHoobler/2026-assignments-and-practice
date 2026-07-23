@@ -14,6 +14,9 @@
 *_cache/
 *_files/
 
+# Quarto rendered files
+*.html
+
 # Knitr cache
 cache/
 
