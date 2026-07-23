@@ -1,0 +1,69 @@
+---
+title: "Welcome!"
+author: "Ray James Hoobler"
+format: 
+  html:
+    embed-resources: true
+---
+
+## MST 6600 Applied Statistical Techniques
+
+This document provides a few simple examples to demonstrate how we will use Quarto during our class. Quarto is an "open-source scientific and technical publishing system" that will allow you to create dynamic content with R code and learn how the platform guides you towards reproducible work.
+
+## Quarto 
+
+This is an example Quarto document, similar to what you will create for each assignment. I encourage you to checkout the [Quarto](https://quarto.org) website for an overview. We will only scratch the surface of what Quarto can do. Personally, I've used Quarto to created almost all the presentations used in this course, online technical documentation in a previous job, and even an e-book.
+
+The key element of Quarto is the ability to create code chunks (or blocks) directly inside the document.
+
+```{r}
+2 + 2
+```
+
+### Markdown
+
+Within RStudio, you can use a visual editor; however, I would encourage you to use the "Source" editor where you write using using plain text.
+
+Markdown is a lightweight, formatting language that allows for basic styling (e.g., headers, bold text, list, etc.) which are then converted into HTML.
+
+You've already seen a second and third level heading above using the octothorpe (hashtag) symbol. 
+
+A comprehensive [Markdown guide](https://quarto.org/docs/authoring/markdown-basics.html) is provided in the Quarto documentation. 
+
+### Code blocks
+
+We introduced a simple code chunk above, but let's demonstrate how you will use code chunks in your document.
+
+#### Loading R packages  
+
+First, you will need to load various R pacakges that will provide functions used in the course.
+
+```{r}
+library(tidyverse)
+```
+
+#### Built-in data files 
+
+When starting out, many of the datasets will be loaded with a package---for example, the `penguins` dataset.
+
+```{r}
+library(palmerpenguins)
+penguins
+```
+
+
+#### Package specific functions
+
+```{r}
+penguins |> 
+  dplyr::select(species)
+```
+
+```{r}
+# Since we've loaded the package (dplyr is part of the tidyverse), we don't need to include the package name
+penguins |> 
+  select(species)
+```
+
+## More to follow!
+
