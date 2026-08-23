@@ -17,6 +17,10 @@
 # Quarto rendered files
 *.html
 
+# Folders to ignore
+module01/01-module01-draft/
+module01/01-module01-class/
+
 # Knitr cache
 cache/
 
