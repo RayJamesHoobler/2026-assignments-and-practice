@@ -1,0 +1,80 @@
+---
+title: "Module01 Assignment02"
+author: "Ray Hoobler"
+format: 
+  html:
+    embed-resources: true
+---
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+## Assignment 
+
+~~We will work on this assignment during class.~~
+
+Assignment 2 Create a new Quarto HTML document and answer questions 1, 2, and 6 in the *R for Data Science* section 1.5.5 Exercises.
+
+### Interpretation (required)
+
+In 2–4 sentences, state in plain language why Wickham has you work through these examples in the context of chapter 1, and identify one assumption or limitation of his methodology and why it matters.
+
+## Questions 
+
+1. The mpg data frame that is bundled with the ggplot2 package contains 234 observations collected by the US Environmental Protection Agency on 38 car models. Which variables in mpg are categorical? Which variables are numerical? (Hint: Type ?mpg to read the documentation for the dataset.) How can you see this information when you run mpg?
+
+A1. In addition to reviewing the documentation, we can use the tidyverse function glimpse to see the types
+
+```{r}
+glimpse(mpg)
+```
+
+The base R way of doing this would be with the `str()` function which shows the structure
+
+```{r}
+str(mpg)
+```
+
+
+2. Make a scatterplot of hwy vs. displ using the mpg data frame. Next, map a third, numerical variable to color, then size, then both color and size, then shape. How do these aesthetics behave differently for categorical vs. numerical variables?
+
+A2. This qets messy quick.
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, colour = cyl, size = cty, shape = fl))
+```
+
+
+6. Why does the following yield two separate legends? How would you fix it to combine the two legends?
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = bill_length_mm, y = bill_depth_mm, 
+    color = species, shape = species
+  )
+) +
+  geom_point() +
+  labs(color = "Species")
+```
+
+A6. It's subtle, but the color is being assigned a new name "Species" that is capitalized. If we want a single legend, we need ot make sure we add shape to the labs() function and with the same capitalization.
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = bill_length_mm, y = bill_depth_mm, 
+    color = species, shape = species
+  )
+) +
+  geom_point() +
+  labs(color = "Species", shape = "Species")
+```
+

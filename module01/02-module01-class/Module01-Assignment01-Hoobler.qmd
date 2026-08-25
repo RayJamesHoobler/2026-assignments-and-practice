@@ -13,6 +13,16 @@ library(tidyverse)
 library(palmerpenguins)
 ```
 
+## Assignment 
+
+We will work on this assignment during class. (We got through most of the questions :^)
+
+Create a new Quarto HTML document and answer questions 1 through 10 in the *R for Data Science* section 1.2.5 ExercisesLinks to an external site..
+
+### Interpretation (required)
+
+In 2–4 sentences, state in plain language why Wickham has you work through these examples in the context of chapter 1, and identify one assumption or limitation of his methodology and why it matters.
+
 
 ## Questions 
 
