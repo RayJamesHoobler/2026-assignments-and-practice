@@ -1,0 +1,76 @@
+---
+title: "Module02 Assignment 02"
+author: "Ray Hoobler"
+format: 
+  html:
+    embed-resources: true
+---
+
+## Libraries
+
+```{r}
+library(nycflights13) # You will probably need to install this package
+library(tidyverse)
+```
+
+## Assignment 
+
+### Interpretation (required)
+
+In 2–4 sentences, state in plain language why Wickham has you work through this question in the context of chapter 3, and identify one assumption or limitation of his methodology and why it matters.
+
+
+### 3.2.5 Question 4
+
+Q4: Was there a flight on every day of 2013? 
+
+(This from the flights dataset in the nycflights13 package)
+
+```{r}
+flights
+```
+
+### A3
+
+There are multiple ways to solve this problem. I've shown several below. My first instinct was to count the number of rows with unique (i.e. *distinct*) `year`, `month`, and `day` columns. 
+
+
+```{r}
+flights |> 
+  distinct(year, month, day) |> # distinct provides arguments on which rows to keep, but in this case is equivalent to count below
+  count()
+```
+
+```{r}
+flights |> 
+  count(year, month, day) |> 
+  count()
+```
+
+
+
+```{r}
+# A more verbose way to get to the same answer.
+
+flights |> 
+  group_by(year, month, day) |> 
+  summarise(count = n()) |> 
+  ungroup() |> 
+  summarise(count = n())
+```
+
+```{r}
+# dplyr has a new feature where we can streamline the group_by() structure only using summarise
+flights |> 
+  summarise(.by = c("year", "month", "day")) |> 
+  summarise(count = n())
+```
+
+
+```{r}
+# Why would I use this method over the one above?
+flights |> 
+  summarise(.by = c("year", "month", "day")) |> 
+  nrow()
+```
+

@@ -1,0 +1,134 @@
+---
+title: "Module02 Assignment03"
+author: "Ray Hoobler"
+format: 
+  html:
+    embed-resources: true
+---
+
+## Libraries 
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+## Assignment
+
+Ask a question about the `penguins` data frame and use `dplyr` functions to answer it.
+
+Use the final output of your analysis to create a table and TWO ggplot2 visualizations. For your explanatory visualizations, include a title, subtitle, axis labels, and a caption.
+
+Be sure to review the rubric to ensure you receive full credit for the assignment.
+
+
+## My question: Is there a strong relationship between bill depth and body mass for each species?
+
+### Visualizations 
+
+```{r}
+penguins |> 
+  ggplot(aes(bill_depth_mm, body_mass_g, color=species)) +
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm", formula = "y ~ x", na.rm = TRUE) +
+  labs(
+    title = "If we don't group by species, we have an example of \"Simpson\'s Paradox",
+    subtitle = "Corresponding tables based on fromulas from Chapter 3 of ISLR",
+    caption = "https://allisonhorst.github.io/palmerpenguins/",
+    x = "Bill Depth (mm)",
+    y = "Body Mass (g)",
+    color = "Species"
+  ) +
+  theme_classic()
+```
+
+### Table of slopes 
+
+The formula for calculating the slope of a line using least squares [ISLR, Chapter 3](https://www.statlearning.com)
+
+$$
+m = \frac{\sum_{i=1}^{n} (x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n} (x_i-\bar{x})^2}
+$$
+
+### Create a function for calculating slope
+
+```{r}
+slope_nist <- function(x, y) {
+  sum((x - mean(x, na.rm = TRUE))*(y - mean(y, na.rm = TRUE)), na.rm = TRUE) / sum((x - mean(x, na.rm = TRUE))^2, na.rm = TRUE)
+}
+```
+
+Testing function above
+
+```{r}
+penguins |> 
+  group_by(species) |> 
+  summarize(slope = slope_nist(bill_depth_mm, body_mass_g)) |> 
+  ungroup()
+```
+
+I also want the confidence interval for the slope.
+
+$$
+\begin{align}
+SE_m = \frac{s}{\sqrt{ \sum{(x - \bar{x})^2}}} \\ \\
+\textrm{where:} \qquad   s = \sqrt{ \frac{\sum{(y - \bar{y})^2}}{n-2} }
+\end{align}
+$$
+Repeat the work above to create a function for standard error of the slope.
+
+```{r}
+slope_se <- function(x, y) {
+  s = sqrt(sum((y - mean(y, na.rm = TRUE))^2, na.rm = TRUE) / (length(y) - 2))
+
+  se_m = s / sqrt(sum((x - mean(x, na.rm = TRUE))^2, na.rm = TRUE))
+  
+  return(se_m)
+}
+```
+
+The CI is defined as $t_{0.05/2} \times SE_{slope}$
+
+```{r}
+penguins |> 
+  group_by(species) |> 
+  summarize(
+    n = n(),
+    slope = slope_nist(bill_depth_mm, body_mass_g),
+    ci_95 = slope_se(bill_depth_mm, body_mass_g) * qt(0.975, df = n -2)
+    ) |> 
+  ungroup()
+```
+
+Finally, I can round the slope and ci_95 values. This is a bit messy as we are starting to "nest" functions. For a publication quality table, I'd do this inside of the R package Great Tables (GT); however, this is outside what we can cover in the course.
+
+```{r}
+my_table <- penguins |> 
+  group_by(species) |> 
+  summarize(
+    n = n(),
+    slope = round(slope_nist(bill_depth_mm, body_mass_g), 1),
+    ci_95 = round(slope_se(bill_depth_mm, body_mass_g) * qt(0.975, df = n -2), 1)
+    ) |> 
+  ungroup()
+
+my_table
+```
+
+
+If my analysis is correct, the slopes are significant; however, the upper and lower confidence values would overlap for all species (barely). 
+
+```{r}
+my_table |> 
+  ggplot() +
+  geom_errorbar(aes(x = species, ymin = slope - ci_95, ymax = slope + ci_95), width = 0.3) +
+  geom_point(aes(x = species, y = slope), size = 4) +
+  labs(
+    title = "\"Statistically\" there is no difference in the relationship \n body_mass_g to bill_depth_mm between species",
+    subtitle = "Uncertainty calcuated using formulas from ISLR Chapter 3",
+    caption = "https://allisonhorst.github.io/palmerpenguins/",
+    x = "Species",
+    y = "Slope +/- 95% Confidence Intervals"
+  )
+```
+
+

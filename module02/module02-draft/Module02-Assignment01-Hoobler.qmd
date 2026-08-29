@@ -1,0 +1,96 @@
+---
+title: "Module02 Assignment01"
+author: "Ray Hoobler"
+format: 
+  html:
+    embed-resources: true
+---
+
+## Libraries 
+
+```{r}
+library(tidyverse)
+```
+
+## Assignment 
+
+### Interpretation (required)
+
+In 2–4 sentences, state in plain language why Wickham has you work through these examples in the context of chapter 2, and identify one assumption or limitation of his methodology and why it matters.
+
+### Exercises 2.5
+
+1. Why does this code not work?
+
+```r
+my_variable <- 10
+my_varıable
+#> Error:
+#> ! object 'my_varıable' not found
+```
+
+**A1. Somehow the "i" in my_variable has been replaced with a non-standard character "ı".**
+
+Look carefully! (This may seem like an exercise in pointlessness, but training your brain to notice even the tiniest difference will pay off when programming.)
+
+2. Tweak each of the following R commands so that they run correctly:
+
+```r
+libary(todyverse)
+
+ggplot(dTA = mpg) + 
+  geom_point(maping = aes(x = displ y = hwy)) +
+  geom_smooth(method = "lm)
+```
+
+**A2. The code below has been fixed**
+
+```{r}
+library(tidyverse)
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  geom_smooth(mapping = aes(x = displ, y = hwy), method = "lm")
+```
+
+
+Q3. Press Option + Shift + K / Alt + Shift + K. What happens? How can you get to the same place using the menus?
+
+**A3. Done. We get the *Keyboard Reference Quick Reference*. This can be found under the *Tools* menu option.**
+
+
+Q4. Let’s revisit an exercise from the Section 1.6. Run the following lines of code. Which of the two plots is saved as mpg-plot.png? Why?
+
+```{r}
+my_bar_plot <- ggplot(mpg, aes(x = class)) +
+  geom_bar()
+
+my_scatter_plot <- ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point()
+
+ggsave(filename = "mpg-plot.png", plot = my_bar_plot)
+```
+
+Because we specify `plot = my_bar_plot` as an argument in the `ggsave()` function, the first plot is saved. If we had not included this argument, the last plot generated would have been saved, i.e., `my_scatter_plot`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
