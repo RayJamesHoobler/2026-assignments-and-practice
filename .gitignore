@@ -5,6 +5,7 @@
 
 # RStudio user-specific files
 .Rproj.user/
+*.Rproj
 
 # macOS metadata
 .DS_Store

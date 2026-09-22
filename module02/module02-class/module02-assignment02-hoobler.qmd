@@ -1,0 +1,33 @@
+---
+title: "Module02 Assignment02"
+author: "Ray Hoobler"
+format: 
+  html:
+    embed-resources: true
+---
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(nycflights13)
+```
+
+## Assignment
+
+Answer question 4 in chapter 3, section 3.2.5 Exercises from R for Data Science (2e)
+
+### Interpretation
+
+In 2–4 sentences, state in plain language why Wickham has you work through this question in the context of chapter 3, and identify one assumption or limitation of his methodology and why it matters.
+
+
+Q. Was there a flight on every day of 2013?
+A. Yes, see code below
+
+```{r}
+flights |> distinct(year, month, day) |> count()
+```
+
+
+

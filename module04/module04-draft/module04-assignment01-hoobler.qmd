@@ -1,0 +1,210 @@
+---
+title: "Module04 Assignment01"
+author: "Ray James Hoobler"
+format:
+  html:
+    embed-resources: true
+---
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+## Assignment 
+
+R4DS (2e) Chapter 9 
+9.3.1 Exercises, questions 1 through 4Links to an external site.
+
+R2DS (2e) Chapter 9
+9.4.1 Exercises. Questions 1 through 7Links to an external site.
+
+## Interpretation (required)
+
+In 2–4 sentences, state in plain language why Wickham has you work through these examples in the context of chapter 9, and identify one assumption or limitation of his methodology and why it matters.
+
+
+## 9.3.1 
+
+Q1. What geom would you use to draw a line chart? A boxplot? A histogram? An area chart?
+
+A1. `geom_line()`, `geom_boxplot()`, `geom_histogram()`, `geom_area()` 
+
+Q2. Earlier in this chapter we used show.legend without explaining it:
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_smooth(aes(color = drv), show.legend = FALSE)
+
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_smooth(aes(color = drv))
+```
+
+Q2. What does `show.legend = FALSE` do here? What happens if you remove it? Why do you think we used it earlier?
+
+A2. `show.legend = FALSE` removes the legend that would normally appear to the right side of the panel. If we remove this code, the legend will be shown as the default is to show the legend.
+
+Q3. What does the `se` argument to geom_smooth() do?
+
+A3. The `se` argument controlls the display of the fit's confidence band. The level is 0.95 by default.
+
+Q4. Recreate the R code necessary to generate the following graphs. Note that wherever a categorical variable is used in the plot, it’s drv.
+
+A4. These are all based on the `mpg` dataset 
+
+```{r}
+#| message: false
+#| fig-width: 6
+#| fig-height: 6
+
+point_size = 1
+linewidth_value = 1
+
+library(patchwork)
+
+tl_plot <- mpg |> 
+  ggplot(aes(displ, hwy)) +
+  geom_point(size = point_size) +
+  geom_smooth(se = FALSE, linewidth = linewidth_value)
+
+tr_plot <- mpg |> 
+  ggplot(aes(displ, hwy)) +
+  geom_smooth(aes(group = drv), se = FALSE, linewidth = linewidth_value) +
+  geom_point(size = point_size)
+
+ml_plot <-  mpg |> 
+  ggplot(aes(displ, hwy, color = drv)) +
+  geom_point(size = point_size) +
+  geom_smooth(se = FALSE, linewidth = linewidth_value)
+
+mr_plot <- mpg |> 
+  ggplot(aes(displ, hwy)) +
+  geom_point(aes(color = drv), size = point_size) +
+  geom_smooth(se = FALSE, linewidth = linewidth_value)
+
+bl_plot <- mpg |> 
+  ggplot(aes(displ, hwy)) +
+  geom_point(aes(color = drv), size = point_size) +
+  geom_smooth(aes(linetype = drv), se = FALSE, linewidth = linewidth_value)
+
+br_plot <- mpg |> 
+  ggplot(aes(displ, hwy, color = drv)) +
+  geom_point(color = "white", size = point_size + 2) +
+  geom_point(size = point_size)
+
+(tl_plot + tr_plot) / (ml_plot + mr_plot) / (bl_plot + br_plot)
+```
+
+## 9.4.1 (at home)
+
+**Use the code cells provided to answer the questions.**
+
+Q1. What happens if you facet on a continuous variable?
+
+A1. Demonstrate with two examples:
+
+**We get a chart for each value**
+
+```{r}
+penguins |> 
+  ggplot(aes(flipper_length_mm, body_mass_g, color = island)) +
+  geom_point() +
+  facet_wrap(~bill_length_mm)
+```
+
+
+```{r}
+mpg |> 
+  ggplot(aes(cyl, hwy, color = drv)) +
+  geom_jitter(width = 0.1) +
+  facet_wrap(~displ)
+```
+
+
+Q2. What do the empty cells in the plot above with facet_grid(drv ~ cyl) mean? Run the following code. How do they relate to the resulting plot?
+
+From "above" in the text:
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  facet_grid(drv ~ cyl, scales = "free")
+```
+
+A2. Empty panels are where no data matches the column or row criteria.
+
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = drv, y = cyl))
+```
+
+Above, we see a missign point at the intersection of cyl = 5 and drv = 4, as well as cyl = 4 & 5 and drv = r
+
+NOTE, there are no vehicles with 7 cylinders. 
+
+
+Q3. What plots does the following code make? What does . do?
+
+We can see in the plots below, the dot, `.`, allows us to move the strip label to either the side (drv ~ .) or top (. ~ drv) using the facet_grid() function. The later is equivalent to facet_wrap(nrow = 1)
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ .)
+
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_grid(. ~ cyl)
+```
+
+Q4. Take the first faceted plot in this section:
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) + 
+  facet_wrap(~ cyl, nrow = 2)
+```
+
+What are the advantages to using faceting instead of the color aesthetic? What are the disadvantages? How might the balance change if you had a larger dataset?
+
+A4. Advantage: Colors may not be an option for a publication. Disadvantage: Sparse data makes the chart less useful. For larger datasets, facets can spread the data out over meaningful categories. 
+
+Q5. Read ?facet_wrap. What does nrow do? What does ncol do? What other options control the layout of the individual panels? Why doesn’t facet_grid() have nrow and ncol arguments?
+
+A5. nrow and ncol set the number of rows and columns in the visualization, respectively. `space` also helps control the layout. Rows and columns are determined by the number of categories.
+
+Q6. Which of the following plots makes it easier to compare engine size (displ) across cars with different drive trains? What does this say about when to place a faceting variable across rows or columns?
+
+```{r}
+ggplot(mpg, aes(x = displ)) + 
+  geom_histogram() + 
+  facet_grid(drv ~ .)
+
+ggplot(mpg, aes(x = displ)) + 
+  geom_histogram() +
+  facet_grid(. ~ drv)
+```
+
+A6. The first plot (stacked vertically) allows easier comparison of the historgram locations.
+
+Q7. Recreate the following plot using facet_wrap() instead of facet_grid(). How do the positions of the facet labels change?
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ .)
+```
+
+A7. Labels move to the to of each panel
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_wrap(~drv, ncol = 1)
+```
+
+
+
+

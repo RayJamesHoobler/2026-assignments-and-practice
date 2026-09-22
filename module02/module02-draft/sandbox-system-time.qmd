@@ -1,0 +1,38 @@
+---
+title: "Sandbox"
+author: "RJH"
+format: 
+  html:
+    embed-resources: true
+---
+
+## Libraries 
+
+```{r}
+library(tidyverse)
+```
+
+## A large vector (series) of numbers
+
+```{r}
+large_sequence <- seq(from = 1, to = 1e9)
+# large_sequence
+```
+
+## Vectorized operation in R
+
+```{r}
+system.time(large_sequence * 2)
+```
+
+
+## For Loop operation in R
+
+```{r}
+system.time(
+  for (n in large_sequence) {
+    n * 2
+  }
+)
+```
+

@@ -1,0 +1,159 @@
+---
+title: "Module04 Assignment02"
+author: "Ray James Hoobler"
+format: 
+  html:
+    embed-resources: true
+df-print: paged
+---
+
+## Libraries
+
+```{r}
+library(tidyverse)
+```
+
+
+## Furnace dataset
+
+### Info from the file
+
+Number of observations                       = 168
+Number of observations per line image        = 4
+Order of variables on a line image--
+   1. Factor Variable RUN          = Run Number
+   2. Factor Variable ZONE         = Each furnace has 4 "zones"
+   3. Factor Variable WAFER        = Within each zone, 2 wafers are
+                                     measured
+   4. Dependent Variable THICKNESS = Film Thickness (Angstroms)
+  
+To read this file into Dataplot--
+   SKIP 25
+   READ FURNACE.DAT RUN ZONE WAFER THICKNESS
+
+
+RUN   ZONE    WAFER    THICKNESS
+
+## From the case study's description
+
+>The goal of this study is to determine if this process is capable of consistently growing oxide films with a thickness of 560 Angstroms +/- 100 Angstroms. An additional goal is to determine important sources of variation for use in the development of a process control strategy.
+
+### NOTE
+
+The factor variable WAFER is not accurate as the two wafers in each zone are unique for every run. **The only comparison we can make is between wafers 1 and 2 in a given zone for a given run.**
+
+```{r}
+
+column_names_furnace <- str_split_1("RUN   ZONE    WAFER    THICKNESS", pattern = "\\s+") |> str_to_lower()
+column_names_furnace
+
+furnace <- read_table("data/FURNACE.DAT", 
+                      skip = 25, 
+                      col_names = column_names_furnace,
+                      col_types = "iffd"
+                      )
+
+furnace
+```
+
+## EDA of FURNACE.DAT
+
+### Summary statistics (base R)
+
+```{r}
+furnace |>
+  select(thickness) |> 
+  summary()
+```
+
+### Summary statistics (`group_by()` and `summarise`)
+
+
+```{r}
+furnace |> 
+  summarise(
+    .by = zone, 
+    mean_zone = mean(thickness, na.rm = TRUE),
+    sd_zone = sd(thickness, na.rm = TRUE)
+    )
+```
+
+
+### Run sequence plot
+
+```{r}
+furnace |> 
+  ggplot(aes(seq_along(thickness), thickness)) +
+  geom_line() +
+  geom_hline(yintercept = 560, color = "black", linetype = "dashed") +
+  geom_hline(yintercept = c(560 + 100, 560 - 100), color = "red", linetype = "dashed") +
+  geom_smooth(method = "lm", formula = "y ~ x") +
+  labs(
+    title = "Run sequence plot show small drift over time"
+  )
+```
+
+### Scatter plot of thickness by run
+
+```{r}
+furnace |> 
+  ggplot(aes(run, thickness)) +
+  geom_point(alpha = 1/2)
+```
+
+
+### Box and whiskers plot to comnpare zones
+
+```{r}
+furnace |> 
+  ggplot(aes(zone, thickness)) +
+  geom_boxplot(notch = TRUE) +
+  labs(
+    title = "Box and whiskers plot implies no significant difference between zones"
+  )
+```
+
+### Does the data reasonably follow a normal distribution
+
+```{r}
+furnace |> 
+  ggplot() +
+  geom_histogram(aes(x = thickness), bins = 50)
+```
+
+
+```{r}
+furnace |> 
+  ggplot() +
+  geom_qq(aes(sample = thickness)) +
+  geom_qq_line(aes(sample = thickness), color = "red")
+```
+
+### Are there trends **within** the data?
+
+```{r}
+furnace_2 <- furnace |> 
+  rownames_to_column() |> 
+  mutate(week = case_when(
+    run <= 7 ~ "week 01",
+    run > 7 & run <= 14 ~ "week 02",
+    run  > 14 ~ "week 03"
+  )
+)
+
+furnace_2
+```
+
+
+```{r}
+furnace_2 |> 
+  ggplot(aes(run, thickness, color = week)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = "y ~ x") +
+  labs(
+    title = "Further reduction of the PM cycle may improve performance"
+  )
+```
+
+
+

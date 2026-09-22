@@ -1,0 +1,25 @@
+---
+title: "Module02 Assignment03"
+author: "Ray"
+format: 
+  html:
+    embed-resources: true
+---
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+```
+
+**Q1. Ask a question about the penguins data frame and use dplyr functions to answer it.**
+
+(See class presentation for a simple example.)
+
+Use the final output of your analysis to create a table and ggplot2 visualization. For your visualization, include a title, subtitle, axis labels, and a caption.
+
+```{r}
+penguins
+```
+

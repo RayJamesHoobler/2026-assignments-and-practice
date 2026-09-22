@@ -1,0 +1,181 @@
+---
+title: "Module04 Assignment01"
+author: "RJH"
+format: 
+  html:
+    embed-resources: true
+---
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(patchwork)
+```
+
+## Asignment 
+
+R4DS (2e)
+
+Chapter 9 
+9.3.1 Exercises, questions 1 through 4Links to an external site.
+
+Chapter 9
+9.4.1 Exercises. Questions 1 through 7Links to an external site.
+
+### Interpretation (required)
+
+In 2–4 sentences, state in plain language why Wickham has you work through these examples in the context of chapter 9, and identify one assumption or limitation of his methodology and why it matters.
+
+
+Q1. What geom would you use to draw a line chart? A boxplot? A histogram? An area chart?
+
+A1. `geom_line()`, `geom_boxplot()`, `geom_histogram()`
+
+Earlier in this chapter we used show.legend without explaining it:
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_smooth(aes(color = drv))
+```
+
+What does show.legend = FALSE do here? What happens if you remove it? Why do you think we used it earlier?
+
+Q3. What does the `se` argument to geom_smooth() do?
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_smooth(aes(color = drv), se = TRUE, level = 0.95)
+```
+
+
+Q4. Recreate the R code necessary to generate the following graphs. Note that wherever a categorical variable is used in the plot, it’s drv.
+
+```{r}
+#| message: false
+#| fig-width: 7
+#| fig-height: 7
+
+point_size <- 2
+linewidth_size <- 1 
+
+tl <- mpg |> 
+  ggplot(aes(displ, hwy)) +
+  geom_point(size = point_size) +
+  geom_smooth(se = FALSE, linewidth = linewidth_size)
+
+tr <- mpg |> 
+  ggplot(aes(displ, hwy)) +
+  geom_point(size = point_size) +
+  geom_smooth(aes(group = drv), se = FALSE, linewidth = linewidth_size)
+
+ml <- mpg |> 
+  ggplot(aes(displ, hwy, color = drv)) +
+  geom_point(size = point_size) +
+  geom_smooth(se = FALSE, linewidth = linewidth_size)
+
+mr <- mpg |> 
+  ggplot(aes(displ, hwy)) +
+  geom_point(aes(color = drv), size = point_size) +
+  geom_smooth(se = FALSE, linewidth = linewidth_size)
+
+bl <- mpg |> 
+  ggplot(aes(displ, hwy)) +
+  geom_point(aes(color = drv), size = point_size) +
+  geom_smooth(aes(linetype = drv), se = FALSE, linewidth = linewidth_size)
+
+br <- mpg |> 
+  ggplot(aes(displ, hwy)) +
+  geom_point(color = "white", size = point_size + 2) +
+  geom_point(aes(color = drv), size = point_size)
+
+(tl + tr) / (ml + mr) / (bl + br)
+```
+
+## 9.4.1
+
+Q1. What happens if you facet on a continuous variable?
+
+Use Penguins?
+
+
+Q2. What do the empty cells in the plot above with facet_grid(drv ~ cyl) mean? Run the following code. How do they relate to the resulting plot?
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = drv, y = cyl))
+```
+
+Q3. What plots does the following code make? What does . do?
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ .)
+
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_grid(. ~ cyl)
+```
+
+Q4. Take the first faceted plot in this section:
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) + 
+  facet_wrap(~ cyl, nrow = 2)
+```
+
+What are the advantages to using faceting instead of the color aesthetic? What are the disadvantages? How might the balance change if you had a larger dataset?
+
+Q5. Read ?facet_wrap. What does nrow do? What does ncol do? What other options control the layout of the individual panels? Why doesn’t facet_grid() have nrow and ncol arguments?
+
+Q6. Which of the following plots makes it easier to compare engine size (displ) across cars with different drive trains? What does this say about when to place a faceting variable across rows or columns?
+
+```{r}
+ggplot(mpg, aes(x = displ)) + 
+  geom_histogram() + 
+  facet_grid(drv ~ .)
+
+ggplot(mpg, aes(x = displ)) + 
+  geom_histogram() +
+  facet_grid(. ~ drv)
+```
+
+Q7. Recreate the following plot using facet_wrap() instead of facet_grid(). How do the positions of the facet labels change?
+
+```{r}
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ .)
+
+ggplot(mpg) + 
+  geom_point(aes(x = displ, y = hwy)) +
+  facet_wrap(~ drv, ncol = 1)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
