@@ -1,0 +1,138 @@
+---
+title: "Module05 Assignment02"
+author: "RJH"
+format:
+  html:
+    embed-resources: true
+df-print: paged
+---
+
+## Libraries
+
+```{r}
+library(tidyverse)
+```
+
+## Assignment
+
+In 2–4 sentences, state what the ANOVA tells you in context, note whether the model's assumptions appear reasonable for this data, and say whether the difference you found is large enough to matter practically — not only statistically.
+
+### Perform a one-way ANOVA analysis on the following dataset
+
+```{r}
+greenhouse_df <- tibble(
+  Control = c(21, 19.5, 22.5, 21.5, 20.5, 21),
+  F1 = c(32, 30.5, 25, 27.5, 28, 28.6),
+  F2 = c(22.5, 26, 28, 27, 26.5, 25.2),
+  F3 = c(28, 27.5, 31, 29.5, 30, 29.2)
+)
+
+greenhouse_df
+```
+
+#### In order to run the ANOVA test, we need to place the column names into a single column as our "factor"
+
+```{r}
+greenhouse_long_df <- greenhouse_df |> 
+  pivot_longer(cols = everything(), names_to = "factor", values_to = "measurement")
+
+greenhouse_long_df
+```
+
+#### ANOVA using `aov()`
+
+```{r}
+greenhouse_aov <- aov(measurement ~ factor, data = greenhouse_long_df)
+
+summary(greenhouse_aov)
+```
+
+#### Plot of the data
+
+```{r}
+greenhouse_long_df |> 
+  ggplot(aes(x = factor, y = measurement)) +
+  geom_point(position = position_jitter(width = 0.1))
+```
+
+```{r}
+TukeyHSD(greenhouse_aov)
+```
+
+#### Perform a two-way ANOVA
+
+```{r}
+greenhouse_df_2 <- read_table("fert    species    resp
+control    SppA    21.0
+control    SppA    19.5
+control    SppA    22.5
+control    SppA    21.5
+control    SppA    20.5
+control    SppA    21.0
+control    SppB    23.7
+control    SppB    23.8
+control    SppB    23.8
+control    SppB    23.7
+control    SppB    22.8
+control    SppB    24.4
+f1    SppA    32.0
+f1    SppA    30.5
+f1    SppA    25.0
+f1    SppA    27.5
+f1    SppA    28.0
+f1    SppA    28.6
+f1    SppB    30.1
+f1    SppB    28.9
+f1    SppB    30.9
+f1    SppB    34.4
+f1    SppB    32.7
+f1    SppB    32.7
+f2    SppA    22.5
+f2    SppA    26.0
+f2    SppA    28.0
+f2    SppA    27.0
+f2    SppA    26.5
+f2    SppA    25.2
+f2    SppB    30.6
+f2    SppB    31.1
+f2    SppB    28.1
+f2    SppB    34.9
+f2    SppB    30.1
+f2    SppB    25.5
+f3    SppA    28.0
+f3    SppA    27.5
+f3    SppA    31.0
+f3    SppA    29.5
+f3    SppA    30.0
+f3    SppA    29.2
+f3    SppB    36.1
+f3    SppB    36.6
+f3    SppB    38.7
+f3    SppB    37.1
+f3    SppB    36.8
+f3    SppB    37.1
+", col_names = TRUE)
+```
+
+
+```{r}
+greenhouse_df_2
+```
+
+
+```{r}
+greenhouse_aov_2factor <- aov(resp ~ fert*species, data = greenhouse_df_2)
+
+summary(greenhouse_aov_2factor)
+```
+
+```{r}
+greenhouse_df_2 |> 
+  ggplot(aes(fert, resp, color = species)) +
+  geom_point(position = position_jitterdodge(jitter.width = 0.1, dodge.width = .75))
+```
+
+```{r}
+TukeyHSD(greenhouse_aov_2factor)
+```
+

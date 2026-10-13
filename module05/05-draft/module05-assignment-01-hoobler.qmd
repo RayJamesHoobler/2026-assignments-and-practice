@@ -1,0 +1,139 @@
+---
+title: "Module05 Assignment01"
+author: "RJH"
+format:
+  html:
+    embed-resources: true
+---
+
+## Libraries
+
+```{r}
+library(tidyverse)
+```
+
+
+## Assignment
+
+### Interpretation (required)
+
+In 2–4 sentences, state in plain language what your result means in the context of the problem, and identify one assumption or limitation of this analysis and why it matters.
+
+
+Create plots for normal, t, and F distributions using ggplot's `stat_function()` layer. 
+
+Provide a brief description of each distribution and an example of how it is used. Include descriptive titles, sub-titles, axis labels
+
+### Normal distribution
+
+From the `dnorm` help page:
+
+>dnorm gives the density . . . of the normal distribution.
+
+The y-axis is the "probability density"
+
+From NIST e-Handbook
+
+>For a continuous function, the probability density function (pdf) is the probability that the variate has the value x. Since for continuous distributions the probability at a single point is zero, this is often expressed in terms of an integral between two points.
+
+```{r}
+tibble(x = c(-3, 3)) |> 
+  ggplot() +
+  stat_function(aes(x), fun = dnorm) +
+  labs(
+    title = "Normal Distrubtion using `dnorm()` function",
+    subtitle = "Baseline for many statisitical checks which assume data follows a 'normal' distribution",
+    y = "Probability Density"
+  )
+```
+
+#### Critical values for 95% probabilities for two-tailed distribution
+
+```{r}
+qnorm(1 - 0.05/2)
+qnorm(0.05/2)
+```
+
+
+
+Probability of finding a value between -1.9 and +1.96 is ~95%
+
+```{r}
+pnorm(1.96) - pnorm(-1.96)
+```
+
+
+
+For each distribution, provide the critical value(s) used to estimate 95% probability. (Only one example is needed if multiple distributions are possible.) Describe if you are using a "one-tailed" or "two-tailed" value.
+
+### t-distribution
+
+```{r}
+tibble(x = c(-3, 3)) |> 
+  ggplot() +
+  stat_function(aes(x), fun = dt, args = list(df = 4), color = "blue") +
+  stat_function(aes(x), fun = dt, args = list(df = 30), color = "red", linetype = "dashed") +
+  stat_function(aes(x), fun = dnorm) +
+  labs(
+    title = "Student t Distrubtion using `dt()` function",
+    subtitle = "Used when sampling is limited; approaches normal distribution when number of samples is >30",
+    y = "Probability Density"
+  )
+```
+
+#### Critical values for df = 9 for two-taild distribution
+
+```{r}
+qt(0.05/2, df = 9, lower.tail = FALSE)
+qt(0.05/2, df = 9)
+```
+
+Probability of finding a value between -2.26 and 2.26 for a t-distribution with df = 9
+
+```{r}
+pt(2.26, df = 9) - pt(-2.26, df = 9)
+```
+
+
+
+### F-distribution
+
+```{r}
+tibble(x = c(0, 5)) |> 
+  ggplot(aes(x)) +
+  stat_function(fun = df, args = list(df1 = 2, df2 = 2), color = "blue") +
+  stat_function(fun = df, args = list(df1 = 9, df2 = 2), color = "red", linetype = "dashed") +
+  stat_function(fun = df, args = list(df1 = 29, df2 = 29), color = "black") +
+  stat_function(fun = df, args = list(df1 = 99, df2 = 99), color = "black", linetype = "dashed") +
+  labs(
+    title = "F distrubtion using `df()` function",
+    subtitle = "Commonly used to create control limits for standard deviation control charts.\nDepends on sampling of two processes",
+    y = "Probability Density"
+  )
+```
+
+#### Critical value for F-distribution for df1 = 9 and df2 = 2 (single-tail distribution)
+
+```{r}
+qf(0.95, df1 = 9, df2 = 2)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

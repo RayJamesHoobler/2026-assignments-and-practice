@@ -1,0 +1,69 @@
+---
+title: "Module06 - Sandbox"
+author: "RJH"
+format:
+  html:
+    embed-resources: true
+---
+
+## Libraries
+
+```{r}
+library(tidyverse)
+library(MASS)
+library(ISLR2)
+library(broom)
+```
+
+## Data 
+```{r}
+mpg
+```
+
+```{r}
+mpg_lm <- lm(hwy ~ cty, data = mpg)
+
+summary(mpg_lm)
+```
+
+
+```{r}
+coef(mpg_lm)
+```
+
+
+```{r}
+mpg_lm_intercept <- coef(mpg_lm)[["(Intercept)"]]
+mpg_lm_intercept
+
+coef(mpg_lm)[["cty"]]
+```
+
+```{r}
+confint(mpg_lm)
+
+model_coef <- names(coef(mpg_lm))
+model_coef
+```
+
+
+```{r}
+augment(mpg_lm)
+```
+
+```{r}
+glance(mpg_lm)
+```
+
+```{r}
+tidy(mpg_lm)
+```
+
+
+
+
+
+
+
+
+

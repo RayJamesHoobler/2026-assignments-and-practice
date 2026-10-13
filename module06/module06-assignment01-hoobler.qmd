@@ -1,0 +1,241 @@
+---
+title: "Module06 Assignment01"
+author: "RJH"
+format:
+  html:
+    embed-resources: true
+df-print: paged
+---
+
+## Assignment
+
+Carry out the analysis as outlined in ISLR2 Chapter 3 Lab (**3.6.1 through 3.6.5**); however, instead of using base R plotting, perform all graphical analysis using ggplot2.
+
+### Interpretation (required)
+
+In 2–4 sentences, state what your model says about the relationship in plain language — the kind of sentence you'd say to a colleague who won't read your code. Then note one diagnostic or assumption that gives you pause, and why.
+
+
+## 3.6.1 Libraries
+
+```{r}
+library(tidyverse)
+# library(MASS)
+library(ISLR2)
+library(broom)
+library(car)
+library(patchwork)
+```
+
+## Data
+
+I recommend that you not "attach" the data to the project as shown in the 
+
+```{r}
+Boston
+```
+
+## 3.6.2 Simple Linear Regression
+
+```{r}
+boston_fit <- lm(medv ~ lstat, data = Boston)
+
+summary(boston_fit)
+```
+
+## Structure of model output
+
+We didn't cover this in class, but you can see what is in the `boston_fit` object using the `str` function.
+
+```{r}
+str(boston_fit)
+```
+
+
+### Names (can be seen in the above output)
+
+```{r}
+names(boston_fit)
+```
+
+
+###  Coefficients 
+
+```{r}
+coef(boston_fit)
+```
+
+
+### Confidence Interval
+
+```{r}
+confint(boston_fit)
+```
+
+
+### Prediction interivals 
+
+```{r}
+predict(boston_fit, tibble(lstat = c(5, 10, 15)), interval = "confidence")
+```
+
+```{r}
+predict(boston_fit, tibble(lstat = c(5, 10, 15)), interval = "predict")
+```
+
+### Base R plot (try to avoid)
+
+```{r}
+plot(Boston$lstat, Boston$medv)
+abline(boston_fit)
+```
+
+Following along in the book; for information (exploration) only.
+
+```{r}
+plot(Boston$lstat , Boston$medv , col = "red")
+plot(Boston$lstat , Boston$medv , pch = 20)
+plot(Boston$lstat , Boston$medv , pch = "+")
+plot(1:20 , 1:20 , pch = 1:20)
+```
+
+When passing a model object to the `plot()` funcdtion, get several charts; however, I find only the first two to be readily accessable and they can be reproduced in `ggplot()` with data generated using the `augment()` function from `broom`.
+
+```{r}
+plot(boston_fit)
+```
+
+```{r}
+plot(predict(boston_fit), residuals(boston_fit))
+plot(predict(boston_fit), rstudent(boston_fit))
+```
+
+```{r}
+plot(hatvalues(boston_fit))
+which.max(hatvalues(boston_fit))
+```
+
+
+## Create a ggplot of the main plot, medv vs lsat
+
+The `augment()` function from the broom package creates a data frame with all the information needed to reproduce the plot above.
+
+```{r}
+augment(boston_fit) |> 
+  ggplot() +
+  geom_point(aes(lstat, medv), shape = 21) +
+  geom_line(aes(lstat, .fitted))
+```
+
+### Residuals versus fitted values
+
+```{r}
+augment(boston_fit) |> 
+  ggplot() +
+  geom_point(aes(.resid, .fitted), shape = 21)
+```
+
+### Leverage: residuals vs .hat
+
+```{r}
+boston_aug <- augment(boston_fit) |> 
+  mutate(observation = row_number())
+
+boston_aug |> 
+  ggplot(aes(.hat, .resid)) +
+  geom_point(shape = 21) +
+  geom_text(
+    data = boston_aug |> filter(.hat == max(.hat)),
+    aes(label = observation),
+    position = position_nudge(y = 2)
+  )
+```
+
+### Histogram of residuals
+
+```{r}
+augment(boston_fit) |>
+  ggplot(aes(x = .resid)) +
+  geom_histogram(bins = 50)
+```
+
+### Quantile-quantile plot
+
+```{r}
+augment(boston_fit) |>
+  ggplot(aes(sample = .resid)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+## 3.6.3 Multiple Linear Regression
+
+```{r}
+boston_fit_v2 <- lm(medv ~ lstat + age, data = Boston)
+
+summary(boston_fit_v2)
+```
+
+```{r}
+boston_fit_v3 <- lm(medv ~ ., data = Boston)
+
+summary(boston_fit_v3)
+```
+
+```{r}
+vif(boston_fit_v3)
+```
+
+## 3.6.4 Interaction Terms
+
+```{r}
+boston_fit_v4 <- lm(medv ~ lstat*age, data = Boston)
+
+summary(boston_fit_v4)
+```
+
+## 3.6.5 Non-linear Transformations of the Predictors
+
+```{r}
+boston_fit_v5 <- lm(medv ~ lstat + I(lstat^2), data = Boston)
+
+summary(boston_fit_v5)
+```
+
+>We use the anova() function to further anova() quantify the extent to which the quadratic fit is superior to the linear fit.
+
+```{r}
+anova(boston_fit, boston_fit_v5)
+```
+
+An R plot of the model
+
+```{r}
+plot(boston_fit_v5)
+```
+
+### ggplot of the predicted values versus actual values and residuals 
+
+```{r}
+p1 <- augment(boston_fit_v5) |> 
+  ggplot() +
+  geom_point(aes(medv, .fitted))
+
+p2 <- augment(boston_fit_v5) |> 
+  ggplot(aes(medv, .resid)) +
+  geom_point()
+
+p1 / p2 +
+  plot_layout(heights = c(4, 2), axes = "collect")
+```
+
+
+```{r}
+augment(boston_fit_v5) |> 
+  ggplot(aes(medv, lstat)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = "y ~ x + I(x^2)")
+```
+
+
+
